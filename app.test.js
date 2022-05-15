@@ -9,6 +9,8 @@ async function createLoggyClient () {
   loggyClient = await launchLoggy()
 }
 
-createLoggyClient()
+createLoggyClient().then(() => {
+  loggy(loggyClient, "PROUT")
+}
+)
 
-loggy(loggyClient, "PROUT")
