@@ -1,0 +1,22 @@
+{
+  "name": "loggy",
+  "version": "1.0.0",
+  "description": "A simple package that allows you to get your console.log on your Discord server.",
+  "main": "loggy.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkergal/loggy.git"
+  },
+  "author": "Johann Kergal",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jkergal/loggy/issues"
+  },
+  "homepage": "https://github.com/jkergal/loggy#readme",
+  "dependencies": {
+    "discord.js": "^13.7.0"
+  }
+}
