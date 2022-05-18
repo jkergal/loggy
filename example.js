@@ -5,12 +5,25 @@ const startLoggyClient = async () => {
   return client
 }
 
+const channelReady = async () => {
+  const channel = await loggy.channelReady()
+  return channel
+}
+
+
 startLoggyClient()
   .then((client) => {
-    // DO SOME STUFF AND LOG IT ON DISCORD WITH logg(client, yourLogMessage)
+
     // console.log(client)
-    loggy.log('PROUT')
-    // AND QUIT LOGGY IF YOU NEED IT
-    // loggy.quit(client)
+    channelReady()
+
+      .then((channel) => {
+        // DO SOME STUFF AND LOG IT ON DISCORD WITH logg(client, yourLogMessage)
+        console.log('BANANE')
+        loggy.log('PROUT')
+        // AND QUIT LOGGY IF YOU NEED IT
+        // loggy.quit(client)
+      })
+
   })
 
