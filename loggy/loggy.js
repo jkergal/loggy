@@ -4,9 +4,21 @@ require('dotenv').config()
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 
-let channel
+// let channel
 
-
+const getChannel = () => {
+    return new Promise(() => {
+        if(client.isReady() === true) {
+            console.log(client.isReady())
+            console.log('getting channel')
+            let channel = client.channels.cache.get(process.env.CHANNEL_ID_LOGS)
+            return channel
+        } else {
+            console.log(client.isReady())
+            setTimeout(() => {getChannel()}, 1000)
+        }
+    })
+}
 class Loggy {
     async client() {
         
@@ -31,41 +43,31 @@ class Loggy {
 
     }
 
-    getChannel = () => {
-        return new Promise((resolve) => {
-            if(client.isReady() === true) {
-                console.log(client.isReady())
-                console.log('getting channel')
-                channel = client.channels.cache.get(process.env.CHANNEL_ID_LOGS)
-                resolve(channel)
-            } else {
-                console.log(client.isReady())
-                setTimeout(() => {loggy.getChannel()}, 1000)
-            }
-        })
-    }
+    // channelReady = async () => {
 
-    channelReady = async () => {
-
-        let channelReady
+    //     let channelReady
     
-        console.log("POMME")
+    //     console.log("POMME")
         
-        try {
-            channelReady = await loggy.getChannel()
-            console.log('fraise')
-        } catch {
-            console.error('error')
-        }
+    //     try {
+    //         channelReady = await loggy.getChannel()
+    //         console.log('fraise')
+    //     } catch {
+    //         console.error('error')
+    //     }
 
-        return channelReady
+    //     return channelReady
         
-    }
+    // }
 
     async log(message) {
+        
 
-        // const channel = await getChannel()
-        channel.send(message)
+        getChannel().then((channelReady) => {
+            console.log(channelReady)
+            channelReady.send(message)
+        })
+
         // console.log(channelID)
 
     }
