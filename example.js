@@ -7,9 +7,7 @@ const startLoggyClient = async () => {
 
 startLoggyClient()
   .then(() => {
-
     // console.log(client)
-
         // DO SOME STUFF AND LOG IT ON DISCORD WITH logg(client, yourLogMessage)
         loggy.log('PROUT')
         // AND QUIT LOGGY IF YOU NEED IT

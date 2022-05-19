@@ -7,12 +7,12 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 // let channel
 
 const getChannel = () => {
-    return new Promise(() => {
+    return new Promise((resolve) => {
         if(client.isReady() === true) {
             console.log(client.isReady())
             console.log('getting channel')
             let channel = client.channels.cache.get(process.env.CHANNEL_ID_LOGS)
-            return channel
+            resolve(channel)
         } else {
             console.log(client.isReady())
             setTimeout(() => {getChannel()}, 1000)
@@ -61,12 +61,16 @@ class Loggy {
     // }
 
     async log(message) {
-        
 
-        getChannel().then((channelReady) => {
-            console.log(channelReady)
+        let channelReady
+        
+        try {
+            channelReady = await getChannel()
+        } catch {
+            console.error('error')
+        }
             channelReady.send(message)
-        })
+
 
         // console.log(channelID)
 
