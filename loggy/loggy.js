@@ -1,108 +1,101 @@
-require('discord.js');
-const { Client, Intents, DataResolver } = require('discord.js');
-require('dotenv').config()
+require("discord.js");
+const { Client, Intents, DataResolver } = require("discord.js");
+require("dotenv").config();
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 
 // let channel
 
 const getChannel = () => {
-    return new Promise(() => {
-        if(client.isReady() === true) {
-            console.log(client.isReady())
-            console.log('getting channel')
-            let channel = client.channels.cache.get(process.env.CHANNEL_ID_LOGS)
-            return channel
-        } else {
-            console.log(client.isReady())
-            setTimeout(() => {getChannel()}, 1000)
-        }
-    })
-}
+  return new Promise((resolve, reject) => {
+    if (client.isReady() === true) {
+      console.log(client.isReady());
+      console.log("getting channel");
+      let channel = client.channels.cache.get(process.env.CHANNEL_ID_LOGS).send("test yolo");
+      return channel;
+    } else {
+      console.log(client.isReady());
+      setTimeout(() => {
+        getChannel();
+      }, 1000);
+    }
+  });
+};
 class Loggy {
-    async client() {
-        
+  async client() {
+    console.log("Loggy is launching");
 
-        console.log("Loggy is launching")
-                
-        client.once('ready', () => {
-            console.log('READY TO DISPLAY LOGS !')
-            
-        })
+    client.once("ready", () => {
+      console.log("READY TO DISPLAY LOGS !");
+    });
 
-        client.login(process.env.DISCORD_LOGGY_TOKEN)
+    client.login(process.env.DISCORD_LOGGY_TOKEN);
 
-        // await isChannelReady().then((isChannelReady) => {
-        //     console.log('le channel est ready :')
-        //     return isChannelReady()
-        // })
+    // await isChannelReady().then((isChannelReady) => {
+    //     console.log('le channel est ready :')
+    //     return isChannelReady()
+    // })
 
-        // console.log(channelReady)
+    // console.log(channelReady)
 
-        return client
+    return client;
+  }
 
-    }
+  // channelReady = async () => {
 
-    // channelReady = async () => {
+  //     let channelReady
 
-    //     let channelReady
-    
-    //     console.log("POMME")
-        
-    //     try {
-    //         channelReady = await loggy.getChannel()
-    //         console.log('fraise')
-    //     } catch {
-    //         console.error('error')
-    //     }
+  //     console.log("POMME")
 
-    //     return channelReady
-        
-    // }
+  //     try {
+  //         channelReady = await loggy.getChannel()
+  //         console.log('fraise')
+  //     } catch {
+  //         console.error('error')
+  //     }
 
-    async log(message) {
-        
+  //     return channelReady
 
-        getChannel().then((channelReady) => {
-            console.log(channelReady)
-            channelReady.send(message)
-        })
+  // }
 
-        // console.log(channelID)
+  async log(message) {
+    getChannel().then((channelReady) => {
+      console.log(channelReady);
+      channelReady.send(message);
+    });
 
-    }
-    
-    // async alert(client, message) {
-    
-    //     const userId = process.env.USER_ID
-    //     const logChannel = await client.channels.cache.get(process.env.CHANNEL_ID_NOTIFICATIONS)
-    //     logChannel.send(`${message} --- <@${userId.toString()}>`)
-    
-    // }    
+    const client = await getChannel();
 
-    // async error(client, message) {
-    
-    //     const userId = process.env.USER_ID
-    //     const cli = await client
-    //     const logChannel = await cli.channels.cache.get(process.env.CHANNEL_ID_NOTIFICATIONS)
-    //     await logChannel.send(`${message} --- <@${userId.toString()}>`)
-    
-    // }
+    client.send(message);
+    // console.log(channelID)
+  }
 
-    quit(client) {
+  // async alert(client, message) {
 
-        console.log("Waiting for Loggy's deconnexion : 10sec...")
-        
-        setTimeout(
-            async function destroy() {
-            await client.destroy()
-        }, 10000)
-    
-    }
+  //     const userId = process.env.USER_ID
+  //     const logChannel = await client.channels.cache.get(process.env.CHANNEL_ID_NOTIFICATIONS)
+  //     logChannel.send(`${message} --- <@${userId.toString()}>`)
+
+  // }
+
+  // async error(client, message) {
+
+  //     const userId = process.env.USER_ID
+  //     const cli = await client
+  //     const logChannel = await cli.channels.cache.get(process.env.CHANNEL_ID_NOTIFICATIONS)
+  //     await logChannel.send(`${message} --- <@${userId.toString()}>`)
+
+  // }
+
+  quit(client) {
+    console.log("Waiting for Loggy's deconnexion : 10sec...");
+
+    setTimeout(async function destroy() {
+      await client.destroy();
+    }, 10000);
+  }
 }
 
-const loggy = new Loggy()
+const loggy = new Loggy();
 
-module.exports = loggy
-
-
+module.exports = loggy;
