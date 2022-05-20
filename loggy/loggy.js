@@ -15,14 +15,15 @@ class Loggy {
 
   async client() {
     console.log("Loggy is launching");
+    // Just pour savoir ce qui ce passe
     this.discordJsClient.on("debug", (e) => {
       console.info(e);
-      if (e.match(/Shard received all its guilds. Marking as fully ready/)) {
-        // Marquer le logger comme pret
-        this.isBotConnected = true;
-        // Envoyer les messages
-        this.processEachMessage();
-      }
+    });
+    this.discordJsClient.on("ready", () => {
+      // Marquer le logger comme pret
+      this.isBotConnected = true;
+      // Envoyer les messages
+      this.processEachMessage();
     });
     await this.discordJsClient.login(process.env.DISCORD_LOGGY_TOKEN);
   }
@@ -36,7 +37,6 @@ class Loggy {
   }
 
   async processEachMessage() {
-    console.log("Go process");
     if (this.tempMessagesStock.length > 0) {
       for (const message of this.tempMessagesStock) {
         await this.discordJsClient.channels.cache.get(process.env.CHANNEL_ID_LOGS).send(message);
