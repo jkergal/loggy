@@ -1,17 +1,13 @@
-const loggy = require('./loggy/loggy')
+const loggy = require("./loggy/loggy");
 
-const startLoggyClient = async () => {
-  const client = await loggy.client()
-  return client
-}
+(async () => {
+  // START BOT
+  await loggy.client();
+  // LOG SOME STUFF
+  await loggy.log("PROUT");
+  await loggy.log("HEYYYYY");
+  await loggy.log("LET'S GO");
 
-startLoggyClient()
-  .then(() => {
-    // console.log(client)
-        // DO SOME STUFF AND LOG IT ON DISCORD WITH logg(client, yourLogMessage)
-        loggy.log('PROUT')
-        // AND QUIT LOGGY IF YOU NEED IT
-        // loggy.quit(client)
-
-  })
-
+  // AND QUIT LOGGY IF YOU NEED IT
+  loggy.quit();
+})();
