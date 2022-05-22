@@ -1,101 +1,128 @@
-require("discord.js");
-const { Client, Intents, DataResolver } = require("discord.js");
-require("dotenv").config();
+import "discord.js";
+import { Client, Intents } from "discord.js";
+import "dotenv/config";
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
-
-// let channel
-
-const getChannel = () => {
-  return new Promise((resolve, reject) => {
-    if (client.isReady() === true) {
-      console.log(client.isReady());
-      console.log("getting channel");
-      let channel = client.channels.cache.get(process.env.CHANNEL_ID_LOGS).send("test yolo");
-      return channel;
-    } else {
-      console.log(client.isReady());
-      setTimeout(() => {
-        getChannel();
-      }, 1000);
-    }
-  });
-};
 class Loggy {
+  discordJsClient;
+  isBotConnected;
+  tempMessagesStock;
+  isDelayedQuittingNeeded;
+  textFormatDiscordSyntax;
+  // isQuitActionAsked;
+
+  constructor() {
+    this.discordJsClient = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
+    this.tempMessagesStock = [];
+    this.isBotConnected = false;
+    this.isDelayedQuittingNeeded = false;
+    this.textFormatDiscordSyntax = "```";
+    // this.isQuitActionAsked = false;
+  }
+
   async client() {
     console.log("Loggy is launching");
+    // Just pour savoir ce qui ce passe
+    // this.discordJsClient.on("debug", (e) => {
+    //   console.info(e);
+    // });
 
-    client.once("ready", () => {
-      console.log("READY TO DISPLAY LOGS !");
+    this.discordJsClient.on("ready", () => {
+      // Marquer le logger comme pret
+      this.isBotConnected = true;
+
+      // Envoyer les messages
+      this.processEachMessage();
+
+      // Delayed quit action if needed
+      if (this.isDelayedQuittingNeeded === true) {
+        this.quit();
+      }
     });
 
-    client.login(process.env.DISCORD_LOGGY_TOKEN);
-
-    // await isChannelReady().then((isChannelReady) => {
-    //     console.log('le channel est ready :')
-    //     return isChannelReady()
-    // })
-
-    // console.log(channelReady)
-
-    return client;
+    await this.discordJsClient.login(process.env.DISCORD_LOGGY_TOKEN);
   }
-
-  // channelReady = async () => {
-
-  //     let channelReady
-
-  //     console.log("POMME")
-
-  //     try {
-  //         channelReady = await loggy.getChannel()
-  //         console.log('fraise')
-  //     } catch {
-  //         console.error('error')
-  //     }
-
-  //     return channelReady
-
-  // }
 
   async log(message) {
-    getChannel().then((channelReady) => {
-      console.log(channelReady);
-      channelReady.send(message);
-    });
-
-    const client = await getChannel();
-
-    client.send(message);
-    // console.log(channelID)
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_1)
+        .send(`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`);
+      console.log("message normally sent");
+    } else {
+      this.tempMessagesStock.push({
+        content: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`,
+        channelID: process.env.CHANNEL_ID_1,
+      });
+    }
   }
 
-  // async alert(client, message) {
+  async alert(message) {
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_1)
+        .send(`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      console.log("alert normally sent");
+    } else {
+      this.tempMessagesStock.push({
+        content: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`,
+        channelID: process.env.CHANNEL_ID_1,
+      });
+    }
+  }
 
-  //     const userId = process.env.USER_ID
-  //     const logChannel = await client.channels.cache.get(process.env.CHANNEL_ID_NOTIFICATIONS)
-  //     logChannel.send(`${message} --- <@${userId.toString()}>`)
+  async error(message) {
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_1)
+        .send(`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      console.log("error normally sent");
+    } else {
+      this.tempMessagesStock.push({
+        content: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`,
+        channelID: process.env.CHANNEL_ID_1,
+      });
+    }
+  }
 
-  // }
+  async save(message) {
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_2)
+        .send(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      console.log("saved alert normally sent");
+    } else {
+      this.tempMessagesStock.push({
+        content: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`,
+        channelID: process.env.CHANNEL_ID_2,
+      });
+    }
+  }
 
-  // async error(client, message) {
+  async processEachMessage() {
+    if (this.tempMessagesStock.length > 0) {
+      for (const message of this.tempMessagesStock) {
+        await this.discordJsClient.channels.cache.get(message.channelID).send(message.content);
+        console.log("delayed message sent");
+      }
+      // clear stock
+      this.tempMessagesStock.length = 0;
+    }
+  }
 
-  //     const userId = process.env.USER_ID
-  //     const cli = await client
-  //     const logChannel = await cli.channels.cache.get(process.env.CHANNEL_ID_NOTIFICATIONS)
-  //     await logChannel.send(`${message} --- <@${userId.toString()}>`)
-
-  // }
-
-  quit(client) {
-    console.log("Waiting for Loggy's deconnexion : 10sec...");
-
-    setTimeout(async function destroy() {
-      await client.destroy();
-    }, 10000);
+  quit() {
+    let client = this.discordJsClient;
+    if (this.isBotConnected) {
+      console.log("Waiting for Loggy's deconnexion : 10sec...");
+      setTimeout(async () => {
+        await client.destroy();
+        console.log("CLIENT HAS BEEN DESTROYED");
+      }, 10000);
+    } else {
+      this.isDelayedQuittingNeeded = true;
+    }
   }
 }
 
 const loggy = new Loggy();
 
-module.exports = loggy;
+export default loggy;

@@ -1,19 +1,12 @@
-const loggy = require('./loggy/loggy')
+import loggy from "./loggy/loggy.js";
 
-const startLoggyClient = async () => {
-  const client = await loggy.client()
-  return client
-}
+  // START BOT
+  await loggy.client();
+  // LOG SOME STUFF
+  await loggy.log("Log absolument normal");
+  await loggy.error("Ceci est une erreur olala");
+  await loggy.alert("Une alerte qui alerte pour des choses alertantes");
+  await loggy.save("Ceci est un message sauvegardé dans un autre chan juste au cas ou")
 
-startLoggyClient()
-  .then(() => {
-
-    // console.log(client)
-
-        // DO SOME STUFF AND LOG IT ON DISCORD WITH logg(client, yourLogMessage)
-        loggy.log('PROUT')
-        // AND QUIT LOGGY IF YOU NEED IT
-        // loggy.quit(client)
-
-  })
-
+  // AND QUIT LOGGY IF YOU NEED IT
+  loggy.quit()
