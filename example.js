@@ -1,4 +1,4 @@
-const loggy = require("./loggy/loggy");
+import loggy from "./loggy/loggy.js";
 
 (async () => {
   // START BOT
@@ -9,5 +9,5 @@ const loggy = require("./loggy/loggy");
   await loggy.log("LET'S GO");
 
   // AND QUIT LOGGY IF YOU NEED IT
-  loggy.quit();
+  loggy.quit()
 })();
