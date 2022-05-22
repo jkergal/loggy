@@ -7,6 +7,8 @@ class Loggy {
   isBotConnected;
   tempMessagesStock;
   isDelayedQuittingNeeded;
+  isMessageSentToChannel2;
+  textFormatDiscordSyntax;
   // isQuitActionAsked;
 
   constructor() {
@@ -14,6 +16,8 @@ class Loggy {
     this.tempMessagesStock = [];
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
+    this.isMessageSentToChannel2 = false;
+    this.textFormatDiscordSyntax = "```"
     // this.isQuitActionAsked = false;
   }
 
@@ -43,21 +47,67 @@ class Loggy {
   async log(message) {
       if (this.isBotConnected) {
         await this.discordJsClient.channels.cache
-          .get(process.env.CHANNEL_ID_LOGS)
-          .send(message);
+          .get(process.env.CHANNEL_ID_1)
+          .send(`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`);
         console.log("message normally sent")
       } else {
-        this.tempMessagesStock.push(message);
+        this.tempMessagesStock.push(`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`);
       }
   }
 
+  async alert(message) {
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_1)
+        .send(`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      console.log("alert normally sent")
+    } else {
+      this.tempMessagesStock.push(`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+    }
+  }
+
+  async error(message) {
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_1)
+        .send(`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      console.log("error normally sent")
+    } else {
+      this.tempMessagesStock
+        .push(`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      
+    }
+  }
+  
+  async save(message) {
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache
+        .get(process.env.CHANNEL_ID_2)
+        .send(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      console.log("saved alert normally sent")
+    } else {
+      this.tempMessagesStock.push(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      this.isMessageSentToChannel2 = true;
+    }
+  } 
+
   async processEachMessage() {
       if (this.tempMessagesStock.length > 0) {
+
         for (const message of this.tempMessagesStock) {
-          await this.discordJsClient.channels.cache
-            .get(process.env.CHANNEL_ID_LOGS)
-            .send(message);
-            console.log("delayed message sent")
+
+          if (this.isMessageSentToChannel2 === false) {
+            await this.discordJsClient.channels.cache
+              .get(process.env.CHANNEL_ID_1)
+              .send(message);
+            console.log("delayed message sent in channel 1")
+          } else {
+            await this.discordJsClient.channels.cache
+              .get(process.env.CHANNEL_ID_2)
+              .send(message);
+            console.log("delayed message sent in channel 2")
+          }
+          
         }
         // clear stock
         this.tempMessagesStock.length = 0;
@@ -66,7 +116,6 @@ class Loggy {
 
   quit() {
     let client = this.discordJsClient
-    console.log(`quit isBotConnected : ${this.isBotConnected}`)
     if (this.isBotConnected) {
       console.log("Waiting for Loggy's deconnexion : 10sec...");
       setTimeout(async () => {
