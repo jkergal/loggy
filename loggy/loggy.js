@@ -8,7 +8,10 @@ class Loggy {
   tempMessagesStock;
   isDelayedQuittingNeeded;
   textFormatDiscordSyntax;
-  // isQuitActionAsked;
+  CHANNEL_ID_1;
+  CHANNEL_ID_2;
+  DISCORD_LOGGY_TOKEN;
+  USER_ID;
 
   constructor() {
     this.discordJsClient = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
@@ -16,85 +19,108 @@ class Loggy {
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
     this.textFormatDiscordSyntax = "```";
-    // this.isQuitActionAsked = false;
+    this.CHANNEL_ID_1 = process.env.CHANNEL_ID_1;
+    this.CHANNEL_ID_2 = process.env.CHANNEL_ID_2;
+    this.DISCORD_LOGGY_TOKEN = process.env.DISCORD_LOGGY_TOKEN;
+    this.USER_ID = process.env.USER_ID;
   }
 
   async client() {
     console.log("Loggy is launching");
-    // Just pour savoir ce qui ce passe
-    // this.discordJsClient.on("debug", (e) => {
-    //   console.info(e);
-    // });
 
     this.discordJsClient.on("ready", () => {
-      // Marquer le logger comme pret
       this.isBotConnected = true;
 
-      // Envoyer les messages
       this.processEachMessage();
 
-      // Delayed quit action if needed
       if (this.isDelayedQuittingNeeded === true) {
         this.quit();
       }
     });
 
-    await this.discordJsClient.login(process.env.DISCORD_LOGGY_TOKEN);
+    await this.discordJsClient.login(this.DISCORD_LOGGY_TOKEN);
   }
 
-  async sendMessage(message, type) {
-    /**
-     * All types of messages
-     */
+  async sendTaggedMessage(message, type, channelId) {
     const messages = {
-      log: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`,
-      alert: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`,
-      error: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`,
+      log: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`,
+      alert: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`,
+      error: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`,
+      save: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`
     };
 
     if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache.get(process.env.CHANNEL_ID_1).send(messages[type]);
+      await this.discordJsClient.channels.cache.get(channelId).send(messages[type]);
     } else {
       this.tempMessagesStock.push({
         content: messages[type],
-        channelID: process.env.CHANNEL_ID_1,
+        channelId: channelId,
       });
     }
   }
 
-  async log(message) {
-    await this.sendMessage(message, "log");
-    console.log("message normally sent");
-  }
+  async sendMessageWithoutTag(message, type, channelId) {
+    const messages = {
+      log: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`,
+      alert: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax}`,
+      error: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax}`,
+      save: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax}`
+    };
 
-  async alert(message) {
-    await this.sendMessage(message, "alert");
-    console.log("alert normally sent");
-  }
-
-  async error(message) {
-    await this.sendMessage(message, "error");
-    console.log("error normally sent");
-  }
-
-  async save(message) {
     if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache
-        .get(process.env.CHANNEL_ID_2)
-        .send(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`);
-      console.log("saved alert normally sent");
+      await this.discordJsClient.channels.cache.get(channelId).send(messages[type]);
     } else {
       this.tempMessagesStock.push({
-        content: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`,
-        channelID: process.env.CHANNEL_ID_2,
+        content: messages[type],
+        channelId: channelId,
       });
+    }
+  }
+
+  async log(message, isUserTagOn) {
+    if (isUserTagOn === true) {
+      await this.sendTaggedMessage(message, "log", this.CHANNEL_ID_1);
+      console.log("message normally sent");
+    } else {
+      await this.sendMessageWithoutTag(message, "log", this.CHANNEL_ID_1);
+      console.log("message normally sent");
+    }
+  }
+
+  async alert(message, isUserTagOn) {
+    if (isUserTagOn === true) {
+      await this.sendTaggedMessage(message, "alert", this.CHANNEL_ID_1);
+      console.log("message normally sent");
+    } else {
+      await this.sendMessageWithoutTag(message, "alert", this.CHANNEL_ID_1);
+      console.log("alert normally sent");
+    }
+  }
+
+  async error(message, isUserTagOn) {
+    if (isUserTagOn === true) {
+      await this.sendTaggedMessage(message, "error", this.CHANNEL_ID_1);
+      console.log("message normally sent");
+    } else {
+      await this.sendMessageWithoutTag(message, "error", this.CHANNEL_ID_1);
+      console.log("error normally sent");
+    }
+  }
+
+  async save(message, isUserTagOn) {
+    if (isUserTagOn === true) {
+      await this.sendTaggedMessage(message, "save", this.CHANNEL_ID_2);
+      console.log("message normally sent");
+    } else {
+      await this.sendMessageWithoutTag(message, "save", this.CHANNEL_ID_2);
+      console.log("message normally sent");
     }
   }
 
   async processEachMessage() {
     if (this.tempMessagesStock.length > 0) {
       for (const message of this.tempMessagesStock) {
-        await this.discordJsClient.channels.cache.get(message.channelID).send(message.content);
+        await this.discordJsClient.channels.cache.get(message.channelId).send(message.content);
         console.log("delayed message sent");
       }
       // clear stock
