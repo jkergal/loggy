@@ -7,7 +7,6 @@ class Loggy {
   isBotConnected;
   tempMessagesStock;
   isDelayedQuittingNeeded;
-  isMessageSentToChannel2;
   textFormatDiscordSyntax;
   // isQuitActionAsked;
 
@@ -16,7 +15,6 @@ class Loggy {
     this.tempMessagesStock = [];
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
-    this.isMessageSentToChannel2 = false;
     this.textFormatDiscordSyntax = "```"
     // this.isQuitActionAsked = false;
   }
@@ -51,7 +49,12 @@ class Loggy {
           .send(`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`);
         console.log("message normally sent")
       } else {
-        this.tempMessagesStock.push(`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`);
+        this.tempMessagesStock.push(
+          {
+            content : `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`, 
+            channelID : process.env.CHANNEL_ID_1
+          }
+        );
       }
   }
 
@@ -62,7 +65,12 @@ class Loggy {
         .send(`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
       console.log("alert normally sent")
     } else {
-      this.tempMessagesStock.push(`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
+      this.tempMessagesStock.push(
+        {
+          content : `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`, 
+          channelID : process.env.CHANNEL_ID_1
+        }
+      );
     }
   }
 
@@ -74,8 +82,12 @@ class Loggy {
       console.log("error normally sent")
     } else {
       this.tempMessagesStock
-        .push(`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
-      
+        .push(
+          {
+            content : `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`, 
+            channelID : process.env.CHANNEL_ID_1
+          }
+        );
     }
   }
   
@@ -86,28 +98,21 @@ class Loggy {
         .send(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
       console.log("saved alert normally sent")
     } else {
-      this.tempMessagesStock.push(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
-      this.isMessageSentToChannel2 = true;
+      this.tempMessagesStock.push(
+        {
+          content : `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`, 
+          channelID : process.env.CHANNEL_ID_2
+      });
     }
   } 
 
   async processEachMessage() {
       if (this.tempMessagesStock.length > 0) {
-
         for (const message of this.tempMessagesStock) {
-
-          if (this.isMessageSentToChannel2 === false) {
             await this.discordJsClient.channels.cache
-              .get(process.env.CHANNEL_ID_1)
-              .send(message);
-            console.log("delayed message sent in channel 1")
-          } else {
-            await this.discordJsClient.channels.cache
-              .get(process.env.CHANNEL_ID_2)
-              .send(message);
-            console.log("delayed message sent in channel 2")
-          }
-          
+              .get(message.channelID)
+              .send(message.content);
+            console.log("delayed message sent")
         }
         // clear stock
         this.tempMessagesStock.length = 0;
