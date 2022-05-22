@@ -1,6 +1,6 @@
 import "discord.js";
 import { Client, Intents } from "discord.js";
-import "dotenv/config"
+import "dotenv/config";
 
 class Loggy {
   discordJsClient;
@@ -15,7 +15,7 @@ class Loggy {
     this.tempMessagesStock = [];
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
-    this.textFormatDiscordSyntax = "```"
+    this.textFormatDiscordSyntax = "```";
     // this.isQuitActionAsked = false;
   }
 
@@ -25,7 +25,7 @@ class Loggy {
     // this.discordJsClient.on("debug", (e) => {
     //   console.info(e);
     // });
-    
+
     this.discordJsClient.on("ready", () => {
       // Marquer le logger comme pret
       this.isBotConnected = true;
@@ -35,97 +35,80 @@ class Loggy {
 
       // Delayed quit action if needed
       if (this.isDelayedQuittingNeeded === true) {
-        this.quit()
+        this.quit();
       }
     });
 
     await this.discordJsClient.login(process.env.DISCORD_LOGGY_TOKEN);
   }
 
+  async sendMessage(message, type) {
+    /**
+     * All types of messages
+     */
+    const messages = {
+      log: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`,
+      alert: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`,
+      error: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`,
+    };
+
+    if (this.isBotConnected) {
+      await this.discordJsClient.channels.cache.get(process.env.CHANNEL_ID_1).send(messages[type]);
+    } else {
+      this.tempMessagesStock.push({
+        content: messages[type],
+        channelID: process.env.CHANNEL_ID_1,
+      });
+    }
+  }
+
   async log(message) {
-      if (this.isBotConnected) {
-        await this.discordJsClient.channels.cache
-          .get(process.env.CHANNEL_ID_1)
-          .send(`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`);
-        console.log("message normally sent")
-      } else {
-        this.tempMessagesStock.push(
-          {
-            content : `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`, 
-            channelID : process.env.CHANNEL_ID_1
-          }
-        );
-      }
+    await this.sendMessage(message, "log");
+    console.log("message normally sent");
   }
 
   async alert(message) {
-    if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache
-        .get(process.env.CHANNEL_ID_1)
-        .send(`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
-      console.log("alert normally sent")
-    } else {
-      this.tempMessagesStock.push(
-        {
-          content : `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`, 
-          channelID : process.env.CHANNEL_ID_1
-        }
-      );
-    }
+    await this.sendMessage(message, "alert");
+    console.log("alert normally sent");
   }
 
   async error(message) {
-    if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache
-        .get(process.env.CHANNEL_ID_1)
-        .send(`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
-      console.log("error normally sent")
-    } else {
-      this.tempMessagesStock
-        .push(
-          {
-            content : `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`, 
-            channelID : process.env.CHANNEL_ID_1
-          }
-        );
-    }
+    await this.sendMessage(message, "error");
+    console.log("error normally sent");
   }
-  
+
   async save(message) {
     if (this.isBotConnected) {
       await this.discordJsClient.channels.cache
         .get(process.env.CHANNEL_ID_2)
-        .send(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`);
-      console.log("saved alert normally sent")
+        .send(`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`);
+      console.log("saved alert normally sent");
     } else {
-      this.tempMessagesStock.push(
-        {
-          content : `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env.USER_ID.toString()}>`, 
-          channelID : process.env.CHANNEL_ID_2
+      this.tempMessagesStock.push({
+        content: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${process.env?.USER_ID?.toString()}>`,
+        channelID: process.env.CHANNEL_ID_2,
       });
     }
-  } 
+  }
 
   async processEachMessage() {
-      if (this.tempMessagesStock.length > 0) {
-        for (const message of this.tempMessagesStock) {
-            await this.discordJsClient.channels.cache
-              .get(message.channelID)
-              .send(message.content);
-            console.log("delayed message sent")
-        }
-        // clear stock
-        this.tempMessagesStock.length = 0;
+    if (this.tempMessagesStock.length > 0) {
+      for (const message of this.tempMessagesStock) {
+        await this.discordJsClient.channels.cache.get(message.channelID).send(message.content);
+        console.log("delayed message sent");
       }
+      // clear stock
+      this.tempMessagesStock.length = 0;
+    }
   }
 
   quit() {
-    let client = this.discordJsClient
+    let client = this.discordJsClient;
     if (this.isBotConnected) {
       console.log("Waiting for Loggy's deconnexion : 10sec...");
       setTimeout(async () => {
         await client.destroy();
-        console.log('CLIENT HAS BEEN DESTROYED')
+        console.log("CLIENT HAS BEEN DESTROYED");
       }, 10000);
     } else {
       this.isDelayedQuittingNeeded = true;
