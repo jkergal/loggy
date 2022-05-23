@@ -8,6 +8,8 @@ class Loggy {
   tempMessagesStock;
   isDelayedQuittingNeeded;
   textFormatDiscordSyntax;
+  messageParams;
+
   CHANNEL_ID_1;
   CHANNEL_ID_2;
   DISCORD_LOGGY_TOKEN;
@@ -19,14 +21,19 @@ class Loggy {
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
     this.textFormatDiscordSyntax = "```";
+    this.messageParams = {}
+
     this.CHANNEL_ID_1 = process.env.CHANNEL_ID_1;
     this.CHANNEL_ID_2 = process.env.CHANNEL_ID_2;
     this.DISCORD_LOGGY_TOKEN = process.env.DISCORD_LOGGY_TOKEN;
     this.USER_ID = process.env.USER_ID;
   }
 
-  async client() {
+  async client(messageParams) {
     console.log("Loggy is launching");
+
+    this.messageParams = messageParams || this.messageParams
+    console.log(this.messageParams)
 
     this.discordJsClient.on("ready", () => {
       this.isBotConnected = true;
@@ -54,7 +61,7 @@ class Loggy {
     } else {
       this.tempMessagesStock.push({
         content: messages[type],
-        channelId: channelId,
+        channelId: channelId
       });
     }
   }
@@ -72,13 +79,13 @@ class Loggy {
     } else {
       this.tempMessagesStock.push({
         content: messages[type],
-        channelId: channelId,
+        channelId: channelId
       });
     }
   }
 
-  async log(message, isUserTagOn) {
-    if (isUserTagOn === true) {
+  async log(message, userTagOn) {
+    if (this.messageParams.logUserTag === true || userTagOn === true) {
       await this.sendTaggedMessage(message, "log", this.CHANNEL_ID_1);
       console.log("message normally sent");
     } else {
@@ -87,8 +94,8 @@ class Loggy {
     }
   }
 
-  async alert(message, isUserTagOn) {
-    if (isUserTagOn === true) {
+  async alert(message, userTagOn) {
+    if (this.messageParams.alertUserTag === true || userTagOn === true) {
       await this.sendTaggedMessage(message, "alert", this.CHANNEL_ID_1);
       console.log("message normally sent");
     } else {
@@ -97,8 +104,8 @@ class Loggy {
     }
   }
 
-  async error(message, isUserTagOn) {
-    if (isUserTagOn === true) {
+  async error(message, userTagOn) {
+    if (this.messageParams.errorUserTag === true || userTagOn === true) {
       await this.sendTaggedMessage(message, "error", this.CHANNEL_ID_1);
       console.log("message normally sent");
     } else {
@@ -107,8 +114,8 @@ class Loggy {
     }
   }
 
-  async save(message, isUserTagOn) {
-    if (isUserTagOn === true) {
+  async save(message, userTagOn) {
+    if (this.messageParams.saveUserTag === true || userTagOn === true) {
       await this.sendTaggedMessage(message, "save", this.CHANNEL_ID_2);
       console.log("message normally sent");
     } else {
@@ -123,7 +130,6 @@ class Loggy {
         await this.discordJsClient.channels.cache.get(message.channelId).send(message.content);
         console.log("delayed message sent");
       }
-      // clear stock
       this.tempMessagesStock.length = 0;
     }
   }
