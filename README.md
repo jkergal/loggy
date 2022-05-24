@@ -12,6 +12,7 @@ No more struggling with the Heroku console or other prod platforms, you can now 
 - `loggy.error("message")` 👉 an error log displayed in red
 
 ![image](https://johannkergal.fr/uploads-hosting/logs-loggy.png)
+![image](https://johannkergal.fr/uploads-hosting/tagged-message.png)
 
 - `loggy.save` 👉 save a log in a secondary channel, to be sure to find it later
 
