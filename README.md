@@ -9,8 +9,11 @@ No more struggling with the Heroku console or other prod platforms, you can now 
 - `loggy.log("message")` 👉 a simple log
 - `loggy.alert("message")` 👉 a log displayed in yellow
 - `loggy.error("message")` 👉 an error log displayed in red
+
 ![image](https://johannkergal.fr/uploads-hosting/logs-loggy.png)
+
 - `loggy.save` 👉 save a log in a secondary channel, to be sure to find it later
+
 ![image](https://johannkergal.fr/uploads-hosting/saved-log-loggy.png)
 
 - `loggy.client()` 👉  to first connect to the bot client 
@@ -25,6 +28,7 @@ No more struggling with the Heroku console or other prod platforms, you can now 
 - create an app called "Loggy"
 - got to the created app, and create a bot in it called... "Loggy" (oh wow, surprising)
 - don't forget to copy the secret Token of your to paste it in your .env file later
+
 ![image](https://johannkergal.fr/uploads-hosting/bot-token.png)
 
 ### Discord server preparation
