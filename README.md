@@ -92,6 +92,12 @@ import loggy from "./loggy/loggy.js";
 
 - [@jkergal](https://github.com/jkergal) (hello@johannkergal.fr)
 
+## Contributor(s)
+
+A big thank to 
+
+- [@laticauda-64](https://github.com/laticauda-64)
+
 
 ## 🔗 Links
 [![website](https://img.shields.io/badge/my_website-000?style=for-the-badge&logo=ko-fi&logoColor=white)](https://johannkergal.fr/)
