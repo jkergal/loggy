@@ -1,6 +1,7 @@
 # Loggy
 A package that allows you to put your logs on your Discord server.
 
+
 ## Features
 Get the production logs of your app directly on your Discord server, using different methods, with different message formats, and chose if you want to get tagged or not on these messages. 
 
@@ -19,7 +20,10 @@ No more struggling with the Heroku console or other prod platforms, you can now 
 - `loggy.client()` 👉  to first connect to the bot client 
 - `loggy.quit()` 👉  to quit Loggy in your app process if you need it
 
+
+
 ## Get Ready
+
 ### NPM
 `npm install loggy-discord`
 
