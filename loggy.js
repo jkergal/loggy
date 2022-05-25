@@ -16,7 +16,14 @@ class Loggy {
   USER_ID;
 
   constructor() {
-    this.discordJsClient = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
+    this.discordJsClient = new Client
+    (
+      { 
+      intents: [Intents.FLAGS.GUILDS, 
+        Intents.FLAGS.GUILD_MESSAGES, 
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS] 
+      }
+    );
     this.tempMessagesStock = [];
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
@@ -33,14 +40,14 @@ class Loggy {
     console.log("Loggy is launching");
 
     this.messageParams = messageParams || this.messageParams;
-    console.log(this.messageParams);
 
-    this.discordJsClient.on("ready", () => {
+    this.discordJsClient.on("ready", async () => {
       this.isBotConnected = true;
 
-      this.processEachMessage();
+      await this.processEachMessage();
 
       if (this.isDelayedQuittingNeeded === true) {
+        console.log("delayed quitting needed")
         this.quit();
       }
     });
@@ -49,48 +56,51 @@ class Loggy {
   }
 
   async sendMessage(message, type, channelId, tempTagOn = false) {
-    const cases = {
+    const logCasesFormatted = {
       log: [`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`, "logUserTag"],
       alert: [`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax}`, "errorUserTag"],
       error: [`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax}`, "alertUserTag"],
       save: [`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax}`, "saveUserTag"],
     };
 
-    const notify = () => (this.messageParams[cases[type][1]] === true || tempTagOn === true ? `🔈 - <@${this.USER_ID.toString()}>` : "");
+    const userTagFormatted = `🔈 - <@${this.USER_ID.toString()}>`
 
-    const buildMessage = cases[type][0] + notify();
+    const builtMessage = logCasesFormatted[type][0] + 
+      (
+        this.messageParams[logCasesFormatted[type][1]] === true || tempTagOn === true 
+        ? userTagFormatted 
+        : ""
+      );
 
     if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache.get(channelId).send(buildMessage);
+      await this.discordJsClient.channels.cache.get(channelId).send(builtMessage);
+      console.log("message normally sent");
     } else {
       this.tempMessagesStock.push({
-        content: buildMessage,
-        channelId: channelId,
+        content: builtMessage,
+        channelId: channelId
       });
     }
   }
 
   async log(message, userTagOn) {
     await this.sendMessage(message, "log", this.CHANNEL_ID_1, userTagOn);
-    console.log("message normally sent");
   }
 
   async alert(message, userTagOn) {
     await this.sendMessage(message, "alert", this.CHANNEL_ID_1, userTagOn);
-    console.log("message normally sent");
   }
 
   async error(message, userTagOn) {
     await this.sendMessage(message, "error", this.CHANNEL_ID_1, userTagOn);
-    console.log("message normally sent");
   }
 
   async save(message, userTagOn) {
     await this.sendMessage(message, "save", this.CHANNEL_ID_2, userTagOn);
-    console.log("message normally sent");
   }
 
   async processEachMessage() {
+
     if (this.tempMessagesStock.length > 0) {
       for (const message of this.tempMessagesStock) {
         await this.discordJsClient.channels.cache.get(message.channelId).send(message.content);
