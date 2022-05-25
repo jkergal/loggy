@@ -1,4 +1,4 @@
-import loggy from "./loggy/loggy.js";
+import loggy from "./loggy.js";
 
   // START BOT
   await loggy.client(
@@ -7,9 +7,9 @@ import loggy from "./loggy/loggy.js";
     // the example below : loggy.log() will not tag you on Discord, but .error(), .alert() and .save() will
     {
     // logUserTag : true, 
-    // errorUserTag : true, 
-    // alertUserTag : true, 
-    // saveUserTag : true
+    errorUserTag : true, 
+    alertUserTag : true, 
+    saveUserTag : true
     }
   );
 
