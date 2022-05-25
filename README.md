@@ -1,7 +1,7 @@
 # Loggy
 A package that allows you to put your logs on your Discord server.
 
-![image](https://johannkergal.fr/uploads-hosting/loggy-logo-500-banner.jpg)
+![image](https://johannkergal.fr/uploads-hosting/loggy-logo-banner.png)
 
 
 ## Features
