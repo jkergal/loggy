@@ -21,7 +21,7 @@ class Loggy {
     this.isBotConnected = false;
     this.isDelayedQuittingNeeded = false;
     this.textFormatDiscordSyntax = "```";
-    this.messageParams = {}
+    this.messageParams = {};
 
     this.CHANNEL_ID_1 = process.env.CHANNEL_ID_1;
     this.CHANNEL_ID_2 = process.env.CHANNEL_ID_2;
@@ -32,8 +32,8 @@ class Loggy {
   async client(messageParams) {
     console.log("Loggy is launching");
 
-    this.messageParams = messageParams || this.messageParams
-    console.log(this.messageParams)
+    this.messageParams = messageParams || this.messageParams;
+    console.log(this.messageParams);
 
     this.discordJsClient.on("ready", () => {
       this.isBotConnected = true;
@@ -48,80 +48,46 @@ class Loggy {
     await this.discordJsClient.login(this.DISCORD_LOGGY_TOKEN);
   }
 
-  async sendTaggedMessage(message, type, channelId) {
-    const messages = {
-      log: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`,
-      alert: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`,
-      error: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`,
-      save: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax} 🔈 - <@${this.USER_ID.toString()}>`
+  async sendMessage(message, type, channelId, tempTagOn = false) {
+    const cases = {
+      log: [`${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`, "logUserTag"],
+      alert: [`${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax}`, "errorUserTag"],
+      error: [`${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax}`, "alertUserTag"],
+      save: [`${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax}`, "saveUserTag"],
     };
 
-    if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache.get(channelId).send(messages[type]);
-    } else {
-      this.tempMessagesStock.push({
-        content: messages[type],
-        channelId: channelId
-      });
-    }
-  }
+    const notify = () => (this.messageParams[cases[type][1]] === true || tempTagOn === true ? `🔈 - <@${this.USER_ID.toString()}>` : "");
 
-  async sendMessageWithoutTag(message, type, channelId) {
-    const messages = {
-      log: `${this.textFormatDiscordSyntax}diff\n ${message}\n${this.textFormatDiscordSyntax}`,
-      alert: `${this.textFormatDiscordSyntax}fix\n- 🔔 ALERT - ${message} \n${this.textFormatDiscordSyntax}`,
-      error: `${this.textFormatDiscordSyntax}diff\n- ❌ ERROR - ${message}\n${this.textFormatDiscordSyntax}`,
-      save: `${this.textFormatDiscordSyntax}md\n# ${message}\n${this.textFormatDiscordSyntax}`
-    };
+    const buildMessage = cases[type][0] + notify();
 
     if (this.isBotConnected) {
-      await this.discordJsClient.channels.cache.get(channelId).send(messages[type]);
+      await this.discordJsClient.channels.cache.get(channelId).send(buildMessage);
     } else {
       this.tempMessagesStock.push({
-        content: messages[type],
-        channelId: channelId
+        content: buildMessage,
+        channelId: channelId,
       });
     }
   }
 
   async log(message, userTagOn) {
-    if (this.messageParams.logUserTag === true || userTagOn === true) {
-      await this.sendTaggedMessage(message, "log", this.CHANNEL_ID_1);
-      console.log("message normally sent");
-    } else {
-      await this.sendMessageWithoutTag(message, "log", this.CHANNEL_ID_1);
-      console.log("message normally sent");
-    }
+    await this.sendMessage(message, "log", this.CHANNEL_ID_1, userTagOn);
+    console.log("message normally sent");
   }
 
   async alert(message, userTagOn) {
-    if (this.messageParams.alertUserTag === true || userTagOn === true) {
-      await this.sendTaggedMessage(message, "alert", this.CHANNEL_ID_1);
-      console.log("message normally sent");
-    } else {
-      await this.sendMessageWithoutTag(message, "alert", this.CHANNEL_ID_1);
-      console.log("alert normally sent");
-    }
+    await this.sendMessage(message, "alert", this.CHANNEL_ID_1, userTagOn);
+    console.log("message normally sent");
   }
 
   async error(message, userTagOn) {
-    if (this.messageParams.errorUserTag === true || userTagOn === true) {
-      await this.sendTaggedMessage(message, "error", this.CHANNEL_ID_1);
-      console.log("message normally sent");
-    } else {
-      await this.sendMessageWithoutTag(message, "error", this.CHANNEL_ID_1);
-      console.log("error normally sent");
-    }
+    await this.sendMessage(message, "error", this.CHANNEL_ID_1, userTagOn);
+    console.log("message normally sent");
   }
 
   async save(message, userTagOn) {
-    if (this.messageParams.saveUserTag === true || userTagOn === true) {
-      await this.sendTaggedMessage(message, "save", this.CHANNEL_ID_2);
-      console.log("message normally sent");
-    } else {
-      await this.sendMessageWithoutTag(message, "save", this.CHANNEL_ID_2);
-      console.log("message normally sent");
-    }
+    await this.sendMessage(message, "save", this.CHANNEL_ID_2, userTagOn);
+    console.log("message normally sent");
   }
 
   async processEachMessage() {

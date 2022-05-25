@@ -6,10 +6,10 @@ import loggy from "./loggy/loggy.js";
     // don't write the param line if you don't want to be tagged on this type of message
     // the example below : loggy.log() will not tag you on Discord, but .error(), .alert() and .save() will
     {
-    // logUserTag : true, 
-    // errorUserTag : true, 
-    // alertUserTag : true, 
-    // saveUserTag : true
+      // logUserTag : true,
+      // errorUserTag : true,
+      // alertUserTag: true,
+      // saveUserTag : true
     }
   );
 
@@ -17,7 +17,7 @@ import loggy from "./loggy/loggy.js";
   loggy.log("This is an absolutely normal log.");
 
   // pass a second arg set to "true" if you exceptionally want to be tagged on this particular .log line
-  loggy.log("Always so normal log, but you are tagged on this one.");
+  loggy.log("Always so normal log, but you are tagged on this one.", true);
 
   loggy.error("A wild error appears !");
 
