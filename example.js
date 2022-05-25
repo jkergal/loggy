@@ -1,4 +1,4 @@
-import loggy from "./loggy/loggy.js";
+import loggy from "./loggy.js";
 
   // START BOT
   await loggy.client(
