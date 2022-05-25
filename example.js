@@ -1,4 +1,7 @@
-import loggy from "./loggy.js";
+import loggy from "loggy-discord"; 
+// note that, to use "import" in a nodeJS env, you have to add the line "type" : "module" in your package.json
+// or use : 
+// const loggy = require("loggy-discord")
 
   // START BOT
 await loggy.client(
@@ -27,3 +30,6 @@ loggy.save("Oh really, a message saved in another channel, that's awesome !");
 
 // AND QUIT LOGGY IF YOU NEED IT
 loggy.quit();
+
+// use async / await in your app process to be sure that loggy.quit() is executing only after messages are sent
+// you wan use await on loggy's methods (example : await loggy.log())
