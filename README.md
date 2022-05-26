@@ -38,6 +38,9 @@ No more struggling with the Heroku console or other prod platforms, you can now 
 
 ![image](https://johannkergal.fr/uploads-hosting/bot-token.png)
 
+If you want to add a profile picture to your Loggy bot, here is his logo :
+https://jker.fr/loggy-logo
+
 ### Discord server preparation
 Create two channels in your own Discord server : 
 - one to post logs
