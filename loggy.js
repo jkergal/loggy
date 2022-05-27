@@ -44,10 +44,11 @@ class Loggy {
     this.discordJsClient.on("ready", async () => {
       this.isBotConnected = true;
 
+      console.log("Loggy is ready to send logs on Discord")
+
       await this.processEachMessage();
 
       if (this.isDelayedQuittingNeeded === true) {
-        console.log("delayed quitting needed")
         this.quit();
       }
     });
@@ -74,7 +75,6 @@ class Loggy {
 
     if (this.isBotConnected) {
       await this.discordJsClient.channels.cache.get(channelId).send(builtMessage);
-      console.log("message normally sent");
     } else {
       this.tempMessagesStock.push({
         content: builtMessage,
@@ -104,7 +104,6 @@ class Loggy {
     if (this.tempMessagesStock.length > 0) {
       for (const message of this.tempMessagesStock) {
         await this.discordJsClient.channels.cache.get(message.channelId).send(message.content);
-        console.log("delayed message sent");
       }
       this.tempMessagesStock.length = 0;
     }
@@ -116,7 +115,7 @@ class Loggy {
       console.log("Waiting for Loggy's deconnexion : 10sec...");
       setTimeout(async () => {
         await client.destroy();
-        console.log("CLIENT HAS BEEN DESTROYED");
+        console.log("Loggy's client has been successfully destroyed");
       }, 10000);
     } else {
       this.isDelayedQuittingNeeded = true;
