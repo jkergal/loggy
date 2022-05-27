@@ -3,6 +3,8 @@ A package that allows you to put your logs on your Discord server.
 
 ![image](https://johannkergal.fr/uploads-hosting/loggy-logo-banner.png)
 
+https://www.npmjs.com/package/loggy-discord
+
 
 ## Features
 Get the production logs of your app directly on your Discord server, using different methods, with different message formats, and chose if you want to get tagged or not on these messages. 
