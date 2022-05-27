@@ -1,7 +1,7 @@
 {
   "name": "loggy-discord",
-  "version": "1.0.0",
-  "description": "A simple package that allows you to get your logs on your Discord server.",
+  "version": "1.0.1",
+  "description": "A simple package that allows you to put your logs on your Discord server.",
   "main": "loggy.js",
   "type" : "module",
   "scripts": {
