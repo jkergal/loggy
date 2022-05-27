@@ -7,7 +7,7 @@ A package that allows you to put your logs on your Discord server.
 ## Features
 Get the production logs of your app directly on your Discord server, using different methods, with different message formats, and chose if you want to get tagged or not on these messages. 
 
-No more struggling with the Heroku console or other prod platforms, you can now use these different available methods with Loggy :
+No more struggling with the Heroku console or other prod platforms where it's not practical to see what's hapenning on your app... You can now use these different available methods with Loggy :
 
 - `loggy.log("message")` 👉 a simple log
 - `loggy.alert("message")` 👉 a log displayed in yellow
@@ -34,7 +34,7 @@ No more struggling with the Heroku console or other prod platforms, you can now 
 - go to your Discord developper portal : https://discord.com/developers/applications
 - create an app called "Loggy"
 - got to the created app, and create a bot in it called... "Loggy" (oh wow, surprising)
-- don't forget to copy the secret Token of your to paste it in your .env file later
+- don't forget to copy the secret Token of your bot to paste it in your .env file later
 
 ![image](https://johannkergal.fr/uploads-hosting/bot-token.png)
 
@@ -48,15 +48,15 @@ Create two channels in your own Discord server :
 - put notifications settings of these chans on "only mentions"
 
 ### Environments variables
-Put some env vars in a .env file, located a the root of your app :
+Put some env vars in a .env file, located at the root of your app :
 ```javascript
 // you got it early, as shown above
 DISCORD_LOGGY_TOKEN=your_secret_discord_bot_token 
 // right click on your channel -> copy ID
 CHANNEL_ID_1=discord_channel_id_where_you_want_logs
-CHANNEL_ID_2=discord_channel_id_where_you_want_notifications
+CHANNEL_ID_2=discord_channel_id_where_you_want_save_logs
 // right click on your profile pic somewhere in a chat -> copy ID
-USER_ID=user_you_want_to_notify_in_chan
+USER_ID=user_you_want_to_tag_in_messages
 ```
 
 ## How to use it in your app
@@ -96,7 +96,7 @@ loggy.save("Oh really, a message saved in another channel, that's awesome !");
 loggy.quit();
 
 // use async / await in your app process to be sure that loggy.quit() is executing only after messages are sent
-// you wan use await on loggy's methods (example : await loggy.log())
+// you can use await on loggy's methods (example : await loggy.log())
 ```
 
 ## Author
@@ -105,7 +105,7 @@ loggy.quit();
 
 ## Contributor(s)
 
-A big thank to 
+A big thank to
 
 - [@laticauda-64](https://github.com/laticauda-64)
 
