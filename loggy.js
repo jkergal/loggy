@@ -1,6 +1,6 @@
-import "discord.js";
-import { Client, Intents } from "discord.js";
-import "dotenv/config";
+require("discord.js");
+const { Client, Intents } = require("discord.js");
+require("dotenv").config();
 
 class Loggy {
   discordJsClient;
@@ -125,4 +125,4 @@ class Loggy {
 
 const loggy = new Loggy();
 
-export default loggy;
+module.exports = loggy;
